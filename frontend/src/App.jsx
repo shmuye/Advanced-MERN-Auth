@@ -7,7 +7,7 @@ import EmailVerificationPage from "./pages/EmailVerificationPage.jsx";
 
 const App = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-950  to-slate-900
+        <div className="z-0 min-h-screen bg-gradient-to-br from-cyan-300  to-sky-400
         flex justify-center items-center relative overflow-hidden ">
               <FloatingShape color="bg-red-900" size="w-64 h-64" top="-5%" left="10%" delay={0} />
               <FloatingShape color="bg-purple-900" size="w-48 h-48" top="70%" left="80%" delay={5} />
