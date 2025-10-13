@@ -11,6 +11,7 @@ export const signup = async (req, res) => {
         if(!email || !password || !name) {
             throw new Error("All fields are required");
         }
+       // checking if the user already exist
 
         const userAlreadyExists = await User.findOne({email})
         if(userAlreadyExists){
@@ -29,10 +30,10 @@ export const signup = async (req, res) => {
         })
         await user.save();
 
-        /*jwt*/
-
+       // generate token using jwt and set cookie
         generateTokenAndSetCookie(res, user._id)
-        /*await sendVerificationEmail(user.email, verificationToken)*/
+
+        await sendVerificationEmail(user.email, verificationToken)
         res.status(201).json({
             success: true,
             message: "user created successfully",
@@ -69,7 +70,7 @@ export const verifyEmail = async (req, res) => {
         user.verificationTokenExpiresAt = undefined;
 
         await user.save()
-        await sendWelcomeEmail(user.email, user.name)
+        // await sendWelcomeEmail(user.email, user.name)
         res.status(200).json({
             success: true,
             message: "email verification successfully",
@@ -145,7 +146,7 @@ export const forgotPassword = async (req, res) => {
 
         /*   send email*/
 
-        await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`)
+        // await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`)
         res.status(200).json({
             success: true,
             message: "Password reset link sent to your email"
@@ -175,7 +176,7 @@ export const resetPassword = async (req, res) => {
         user.resetPasswordExpiresAt = undefined;
 
         await user.save()
-        await sendResetSuccessEmail(user.email)
+        // await sendResetSuccessEmail(user.email)
 
         res.status(200).json({
             success: true,
