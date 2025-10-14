@@ -2,7 +2,12 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
 import {generateTokenAndSetCookie} from "../utils/generateTokenAndSetCookie.js";
-import { sendVerificationEmail, sendPasswordResetEmail, sendResetSuccessEmail }  from "../mailtrap/emails.js";
+import {
+    sendVerificationEmail,
+    sendPasswordResetEmail,
+    sendResetSuccessEmail,
+    sendWelcomeEmail
+} from "../mailtrap/emails.js";
 
 import {User} from "../models/user.model.js";
 export const signup = async (req, res) => {
@@ -56,32 +61,38 @@ export const verifyEmail = async (req, res) => {
 
     const { code } = req.body;
     try{
-        const user = User.findOne({
+        // checking if the users code is valid
+        const user = await User.findOne({
             verificationToken: code,
             verificationTokenExpiresAt: {$gt: Date.now()}
         })
         if(!user){
-            res.send.status(400).json({
+            return res.status(400).json({
                 success: false,
                 message: "invalid or expired verification code" });
         }
         user.isVerified = true;
+
+        // no need to store the verification token after the user is verified
         user.verificationToken = undefined;
         user.verificationTokenExpiresAt = undefined;
 
         await user.save()
-        // await sendWelcomeEmail(user.email, user.name)
+
+        // sending welcome email after we verify the user
+
+        await sendWelcomeEmail(user.email, user.name)
         res.status(200).json({
             success: true,
-            message: "email verification successfully",
+            message: "email verified successfully",
             user:{
-                ...user_doc,
+                ...user._doc,
                 password: undefined,
 
             }
         })
     }catch(err){
-        console.log("error verifying your email", email)
+        console.log("error verifying your email",err.message)
         return res.status(500).json({success: false, message: "server error" });
     }
 
@@ -90,7 +101,13 @@ export const verifyEmail = async (req, res) => {
 export const login = async (req, res) => {
     const { email, password } = req.body;
     try {
+
         const user = await User.findOne({email})
+
+        //check if the password matches
+        //first the password in the database is decoded then it is compared with the password
+        // entered by the user
+
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!user || !passwordMatch) {
             res.status(400).json({
@@ -100,6 +117,8 @@ export const login = async (req, res) => {
         }
 
         generateTokenAndSetCookie(res, user._id)
+
+        //update login history to now
         user.lastLogin = new Date();
 
         await user.save()
@@ -114,6 +133,7 @@ export const login = async (req, res) => {
         })
 
     }catch(error) {
+        console.log("error in login", error)
         res.status(500).json({
             success: false,
             message: error.message
@@ -121,6 +141,7 @@ export const login = async (req, res) => {
     }
 }
 
+// for logout, clear out the cookie
 export const logout = async (req, res) => {
     res.clearCookie("token");
     res.status(200).json({
