@@ -10,6 +10,7 @@ import {
 } from "../mailtrap/emails.js";
 
 import {User} from "../models/user.model.js";
+
 export const signup = async (req, res) => {
     const { email, password,name } = req.body;
     try {
@@ -156,10 +157,13 @@ export const forgotPassword = async (req, res) => {
     try{
         const user = await User.findOne({email})
         if(!user){
-            res.status(400).json({message: "user not found"});
+            return res.status(400).json({message: "user not found"});
         }
+
+        // generate a password reset token
+
         const resetToken = crypto.randomBytes(20).toString("hex");
-        const resetTokenExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
+        const resetTokenExpiresAt = Date.now() + 60 * 60 * 1000; // 1 hour
 
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpiresAt = resetTokenExpiresAt;
@@ -167,7 +171,7 @@ export const forgotPassword = async (req, res) => {
 
         /*   send email*/
 
-        // await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`)
+        await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`)
         res.status(200).json({
             success: true,
             message: "Password reset link sent to your email"
@@ -189,15 +193,17 @@ export const resetPassword = async (req, res) => {
         })
 
         if (!user) {
-            res.status(400).json({status: false, message: "invalid or expired token"});
+           return res.status(400).json({status: false, message: "invalid or expired token"});
         }
+
+        // update password
         const hashedPassword = await bcrypt.hash(password, 10);
         user.password = hashedPassword;
         user.resetPasswordToken = undefined;
         user.resetPasswordExpiresAt = undefined;
 
         await user.save()
-        // await sendResetSuccessEmail(user.email)
+        await sendResetSuccessEmail(user.email)
 
         res.status(200).json({
             success: true,
