@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import axios from 'axios'
 
-const API_URL = 'http://localhost:3000'
+const API_URL = "http://localhost:3000";
+console.log(API_URL)
 axios.defaults.withCredentials = true;
 
 export const useAuthStore = create(set => ({
@@ -27,10 +28,20 @@ export const useAuthStore = create(set => ({
         try {
             const response = await axios.post(`${API_URL}/auth/verify-email`, {code})
             set({user: response.data.user, isAuthenticated: true, isLoading: false})
+            return response.data
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message || "Error verifying email"
             set({error: errorMessage , isLoading: false})
             throw error;
+        }
+    },
+    checkAuth: async () => {
+        set({error: null, isCheckingAuth: true})
+        try {
+           const response = await axios.get(`${API_URL}/check-auth`, {})
+            set({user: response.data.user, isCheckingAuth: false, isAuthenticated: true })
+        }catch(error) {
+         set({error: null, isCheckingAuth: false, isAuthenticated: false })
         }
     }
 }))

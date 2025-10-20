@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors(
     {
-        origin: process.env.CLIENT_URI,
+        origin: process.env.CLIENT_URL,
         credentials: true,
     }
 ));
