@@ -71,7 +71,12 @@ const App = () => {
                        <ForgotPassword />
                     </RedirectAuthenticatedUser>
                 } />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/reset-password/:token" element={
+                    <RedirectAuthenticatedUser>
+                        <ResetPassword />
+                    </RedirectAuthenticatedUser>
+
+                } />
                 <Route path="/verify-email" element={<EmailVerificationPage />} />
             </Routes>
             <Toaster />

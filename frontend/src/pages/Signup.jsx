@@ -6,6 +6,7 @@ import {Link} from "react-router-dom";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter.jsx";
 import {useNavigate} from "react-router-dom";
 import {useAuthStore} from "../store/authStore.js";
+import Button from "../components/Button.jsx";
 
 const Signup = () => {
     const [name, setName] = useState("")
@@ -60,20 +61,12 @@ const Signup = () => {
                    />
                     {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
                    <PasswordStrengthMeter password={password}/>
-                    <motion.button
-                        className="cursor-pointer mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600
-                        text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-70
-                        focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900
-                        transition duration-200"
-                        whileHover={{scale: 1.02}}
-                        whileTap={{scale: 0.98}}
+                    <Button
                         type="submit"
+                        isLoading={isLoading}
                         disabled={isLoading}
-                    >
-                        {
-                            isLoading ? <Loader className="animate-spin mx-auto " size={24} /> : "Sign Up"
-                        }
-                    </motion.button>
+                        text="Sign Up"
+                    />
                 </form>
             </div>
             <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">

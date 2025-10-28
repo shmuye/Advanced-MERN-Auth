@@ -4,6 +4,7 @@ import React, {useEffect, useRef, useState} from "react"
 import {useNavigate} from "react-router-dom";
 import {useAuthStore} from "../store/authStore.js";
 import toast from "react-hot-toast";
+import Button from "../components/Button.jsx";
 const EmailVerificationPage = () => {
     const [code, setCode] = useState(["", "", "", "", "", ""])
     const inputRefs = useRef([])
@@ -100,19 +101,14 @@ const EmailVerificationPage = () => {
                         }
                     </div>
                     {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
-                    <motion.button
-                        className="cursor-pointer mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600
-                        text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-70
-                        focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900
-                        transition duration-200"
-                        whileHover={{scale: 1.02}}
-                        whileTap={{scale: 0.98}}
+                    <Button
+                        text="Verify Email"
                         type="submit"
-                    >
-                        {
-                            isLoading ? "Verifying" : "Verify Email"
-                        }
-                    </motion.button>
+                        isLoading={isLoading}
+                        loadingText="Verifying"
+                    />
+
+
                 </form>
             </motion.div>
 

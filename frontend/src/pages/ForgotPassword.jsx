@@ -5,7 +5,8 @@ import {ArrowLeft} from 'lucide-react'
 
 import {useAuthStore} from "../store/authStore.js";
 import Input  from "../components/Input.jsx";
-import {Mail, Loader} from 'lucide-react'
+import {Mail } from 'lucide-react'
+import Button from "../components/Button.jsx";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("")
@@ -13,7 +14,9 @@ const ForgotPassword = () => {
     const { isLoading, forgotPassword, error } = useAuthStore()
 
     const handleSubmit = async (e) => {
-
+             e.preventDefault()
+             await forgotPassword(email)
+             setIsSubmitted(true)
     }
 
     return (
@@ -29,9 +32,11 @@ const ForgotPassword = () => {
                     Forgot Password
                 </h2>
                 {
-                    isSubmitted ? (
+                    !isSubmitted ? (
                         <form onSubmit={handleSubmit}>
-                            <p>Enter your email address and we will send you a link to reset your password</p>
+                            <p className="text-gray-300 mb-6 text-center">
+                                Enter your email address and we will send you a link to reset your password
+                            </p>
                             <Input
                                icon={Mail}
                                type="email"
@@ -40,20 +45,12 @@ const ForgotPassword = () => {
                                onChange={(e) => setEmail(e.target.value)}
                                required
                             />
-                            <motion.button
-                                whileHover={{scale: 1.02}}
-                                whileTap={{scale: 0.98}}
+                            <Button
                                 type="submit"
-                                className="cursor-pointer mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600
-                     text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700
-                     focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900
-                     transition duration-200"
-                            >
-                                {
-                                    isLoading ? <Loader className="size-6 animate-spin mx-auto" />: "Send Reset Link"
-                                }
+                                text="Send Reset Link"
+                                isLoading={isLoading}
+                            />
 
-                            </motion.button>
                         </form>
                     ) : (
                        <div>
